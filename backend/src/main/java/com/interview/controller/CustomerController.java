@@ -12,7 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Pattern;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * REST controller for Customer operations.
@@ -21,6 +25,7 @@ import javax.validation.Valid;
 @RequestMapping("/api/customers")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -28,10 +33,10 @@ public class CustomerController {
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Page<CustomerResponseDto>> getAllCustomers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page number must be non-negative") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int size,
+            @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
+            @RequestParam(defaultValue = "asc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email) {
@@ -48,10 +53,10 @@ public class CustomerController {
     @GetMapping("/admin/all")
     @RequireAdmin
     public ResponseEntity<Page<CustomerResponseDto>> getAllCustomersIncludingDeleted(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page number must be non-negative") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int size,
+            @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
+            @RequestParam(defaultValue = "asc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
@@ -69,7 +74,7 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<CustomerResponseDto> getCustomerById(@PathVariable Long id) {
+    public ResponseEntity<CustomerResponseDto> getCustomerById(@PathVariable @Min(value = 1, message = "Customer ID must be positive") Long id) {
         log.info("GET /api/customers/{}", id);
         
         CustomerResponseDto customer = customerService.getCustomerById(id);
@@ -92,7 +97,7 @@ public class CustomerController {
     @PutMapping("/{id}")
     @RequireAdmin
     public ResponseEntity<CustomerResponseDto> updateCustomer(
-            @PathVariable Long id, 
+            @PathVariable @Min(value = 1, message = "Customer ID must be positive") Long id, 
             @Valid @RequestBody CustomerRequestDto request) {
         
         log.info("PUT /api/customers/{} - updating customer", id);
@@ -105,7 +110,7 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     @RequireAdmin
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable @Min(value = 1, message = "Customer ID must be positive") Long id) {
         log.info("DELETE /api/customers/{}", id);
         
         customerService.deleteCustomer(id);
