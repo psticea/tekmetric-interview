@@ -33,18 +33,18 @@ public class CustomerController {
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Page<CustomerResponseDto>> getAllCustomers(
-            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page number must be non-negative") int page,
-            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int size,
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "Page number must be at least 1") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int pageSize,
             @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
             @RequestParam(defaultValue = "asc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email) {
         
-        log.info("GET /api/customers - page: {}, size: {}, sortBy: {}, sortDir: {}", page, size, sortBy, sortDir);
+        log.info("GET /api/customers - page: {}, pageSize: {}, sortBy: {}, sortDir: {}", page, pageSize, sortBy, sortDir);
         
         Page<CustomerResponseDto> customers = customerService.getAllCustomers(
-                page, size, sortBy, sortDir, firstName, lastName, email);
+                page - 1, pageSize, sortBy, sortDir, firstName, lastName, email);
         
         log.info("Returning {} active customers out of {} total", customers.getNumberOfElements(), customers.getTotalElements());
         return ResponseEntity.ok(customers);
@@ -53,8 +53,8 @@ public class CustomerController {
     @GetMapping("/admin/all")
     @RequireAdmin
     public ResponseEntity<Page<CustomerResponseDto>> getAllCustomersIncludingDeleted(
-            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page number must be non-negative") int page,
-            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int size,
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "Page number must be at least 1") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int pageSize,
             @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
             @RequestParam(defaultValue = "asc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir,
             @RequestParam(required = false) String firstName,
@@ -62,10 +62,10 @@ public class CustomerController {
             @RequestParam(required = false) String email,
             @RequestParam(defaultValue = "false") boolean includeDeleted) {
         
-        log.info("GET /api/customers/admin/all - page: {}, size: {}, includeDeleted: {}", page, size, includeDeleted);
+        log.info("GET /api/customers/admin/all - page: {}, pageSize: {}, includeDeleted: {}", page, pageSize, includeDeleted);
         
         Page<CustomerResponseDto> customers = customerService.getAllCustomersIncludingDeleted(
-                page, size, sortBy, sortDir, firstName, lastName, email, includeDeleted);
+                page - 1, pageSize, sortBy, sortDir, firstName, lastName, email, includeDeleted);
         
         log.info("Returning {} customers out of {} total (includeDeleted: {})", 
                 customers.getNumberOfElements(), customers.getTotalElements(), includeDeleted);
