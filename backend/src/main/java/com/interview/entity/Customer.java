@@ -1,6 +1,8 @@
 package com.interview.entity;
 
-import lombok.With;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,55 +15,70 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "customers")
-@With
-public record Customer(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        Long id,
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Customer {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @NotBlank(message = "First name is required")
-        @Size(max = 50, message = "First name must not exceed 50 characters")
-        @Column(name = "first_name", nullable = false, length = 50)
-        String firstName,
+    @NotBlank(message = "First name is required")
+    @Size(max = 50, message = "First name must not exceed 50 characters")
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
 
-        @NotBlank(message = "Last name is required")
-        @Size(max = 50, message = "Last name must not exceed 50 characters")
-        @Column(name = "last_name", nullable = false, length = 50)
-        String lastName,
+    @NotBlank(message = "Last name is required")
+    @Size(max = 50, message = "Last name must not exceed 50 characters")
+    @Column(name = "last_name", nullable = false, length = 50)
+    private String lastName;
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Email should be valid")
-        @Column(name = "email", nullable = false, unique = true)
-        String email,
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
-        @Size(max = 15, message = "Phone number must not exceed 15 characters")
-        @Column(name = "phone_number", length = 15)
-        String phoneNumber,
+    @Size(max = 15, message = "Phone number must not exceed 15 characters")
+    @Column(name = "phone_number", length = 15)
+    private String phoneNumber;
 
-        @Column(name = "created_at", nullable = false, updatable = false)
-        LocalDateTime createdAt,
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-        @Column(name = "last_modified", nullable = false)
-        LocalDateTime lastModified,
+    @Column(name = "last_modified", nullable = false)
+    private LocalDateTime lastModified;
 
-        @Column(name = "deleted", nullable = false)
-        Boolean deleted
-) {
-    public Customer {
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
         if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+            createdAt = now;
         }
         if (lastModified == null) {
-            lastModified = LocalDateTime.now();
+            lastModified = now;
         }
         if (deleted == null) {
             deleted = false;
         }
     }
 
+    @PreUpdate
+    protected void onUpdate() {
+        lastModified = LocalDateTime.now();
+    }
+
     // Factory method for creating new customers
     public static Customer createNew(String firstName, String lastName, String email, String phoneNumber) {
-        LocalDateTime now = LocalDateTime.now();
-        return new Customer(null, firstName, lastName, email, phoneNumber, now, now, false);
+        Customer customer = new Customer();
+        customer.setFirstName(firstName);
+        customer.setLastName(lastName);
+        customer.setEmail(email);
+        customer.setPhoneNumber(phoneNumber);
+        customer.setDeleted(false);
+        return customer;
     }
 }

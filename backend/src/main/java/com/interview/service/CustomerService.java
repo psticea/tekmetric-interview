@@ -65,7 +65,7 @@ public class CustomerService {
         Customer customer = customerRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
         
-        log.info("Found customer: {}", customer.email());
+        log.info("Found customer: {}", customer.getEmail());
         return mapToResponseDto(customer);
     }
 
@@ -84,7 +84,7 @@ public class CustomerService {
         );
 
         Customer savedCustomer = customerRepository.save(customer);
-        log.info("Successfully created customer with id: {}", savedCustomer.id());
+        log.info("Successfully created customer with id: {}", savedCustomer.getId());
         
         return mapToResponseDto(savedCustomer);
     }
@@ -96,20 +96,19 @@ public class CustomerService {
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
 
         // Check if email is being changed and if new email already exists
-        if (!existingCustomer.email().equals(request.email()) && 
+        if (!existingCustomer.getEmail().equals(request.email()) && 
             customerRepository.existsByEmailAndDeletedFalse(request.email())) {
             throw new DuplicateEmailException("Customer with email " + request.email() + " already exists");
         }
 
-        Customer updatedCustomer = existingCustomer
-                .withFirstName(request.firstName())
-                .withLastName(request.lastName())
-                .withEmail(request.email())
-                .withPhoneNumber(request.phoneNumber())
-                .withLastModified(LocalDateTime.now());
+        existingCustomer.setFirstName(request.firstName());
+        existingCustomer.setLastName(request.lastName());
+        existingCustomer.setEmail(request.email());
+        existingCustomer.setPhoneNumber(request.phoneNumber());
+        existingCustomer.setLastModified(LocalDateTime.now());
 
-        Customer savedCustomer = customerRepository.save(updatedCustomer);
-        log.info("Successfully updated customer with id: {}", savedCustomer.id());
+        Customer savedCustomer = customerRepository.save(existingCustomer);
+        log.info("Successfully updated customer with id: {}", savedCustomer.getId());
         
         return mapToResponseDto(savedCustomer);
     }
@@ -120,23 +119,22 @@ public class CustomerService {
         Customer existingCustomer = customerRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
 
-        Customer deletedCustomer = existingCustomer
-                .withDeleted(true)
-                .withLastModified(LocalDateTime.now());
+        existingCustomer.setDeleted(true);
+        existingCustomer.setLastModified(LocalDateTime.now());
 
-        customerRepository.save(deletedCustomer);
+        customerRepository.save(existingCustomer);
         log.info("Successfully soft deleted customer with id: {}", id);
     }
 
     private CustomerResponseDto mapToResponseDto(Customer customer) {
         return new CustomerResponseDto(
-                customer.id(),
-                customer.firstName(),
-                customer.lastName(),
-                customer.email(),
-                customer.phoneNumber(),
-                customer.createdAt(),
-                customer.lastModified()
+                customer.getId(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getPhoneNumber(),
+                customer.getCreatedAt(),
+                customer.getLastModified()
         );
     }
 }
