@@ -86,11 +86,11 @@ public class CustomerController {
     @PostMapping
     @RequireAdmin
     public ResponseEntity<CustomerResponseDto> createCustomer(@Valid @RequestBody CustomerRequestDto request) {
-        log.info("POST /api/customers - creating customer with email: {}", request.email());
+        log.info("POST /api/customers - creating customer with email: {}", request.getEmail());
         
         CustomerResponseDto customer = customerService.createCustomer(request);
         
-        log.info("Successfully created customer with id: {}", customer.id());
+        log.info("Successfully created customer with id: {}", customer.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(customer);
     }
 

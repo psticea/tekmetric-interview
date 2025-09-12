@@ -70,17 +70,17 @@ public class CustomerService {
     }
 
     public CustomerResponseDto createCustomer(CustomerRequestDto request) {
-        log.info("Creating new customer with email: {}", request.email());
+        log.info("Creating new customer with email: {}", request.getEmail());
         
-        if (customerRepository.existsByEmailAndDeletedFalse(request.email())) {
-            throw new DuplicateEmailException("Customer with email " + request.email() + " already exists");
+        if (customerRepository.existsByEmailAndDeletedFalse(request.getEmail())) {
+            throw new DuplicateEmailException("Customer with email " + request.getEmail() + " already exists");
         }
 
         Customer customer = Customer.createNew(
-                request.firstName(),
-                request.lastName(),
-                request.email(),
-                request.phoneNumber()
+                request.getFirstName(),
+                request.getLastName(),
+                request.getEmail(),
+                request.getPhoneNumber()
         );
 
         Customer savedCustomer = customerRepository.save(customer);
@@ -96,15 +96,15 @@ public class CustomerService {
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
 
         // Check if email is being changed and if new email already exists
-        if (!existingCustomer.getEmail().equals(request.email()) && 
-            customerRepository.existsByEmailAndDeletedFalse(request.email())) {
-            throw new DuplicateEmailException("Customer with email " + request.email() + " already exists");
+        if (!existingCustomer.getEmail().equals(request.getEmail()) && 
+            customerRepository.existsByEmailAndDeletedFalse(request.getEmail())) {
+            throw new DuplicateEmailException("Customer with email " + request.getEmail() + " already exists");
         }
 
-        existingCustomer.setFirstName(request.firstName());
-        existingCustomer.setLastName(request.lastName());
-        existingCustomer.setEmail(request.email());
-        existingCustomer.setPhoneNumber(request.phoneNumber());
+        existingCustomer.setFirstName(request.getFirstName());
+        existingCustomer.setLastName(request.getLastName());
+        existingCustomer.setEmail(request.getEmail());
+        existingCustomer.setPhoneNumber(request.getPhoneNumber());
         existingCustomer.setLastModified(LocalDateTime.now());
 
         Customer savedCustomer = customerRepository.save(existingCustomer);
@@ -127,14 +127,14 @@ public class CustomerService {
     }
 
     private CustomerResponseDto mapToResponseDto(Customer customer) {
-        return new CustomerResponseDto(
-                customer.getId(),
-                customer.getFirstName(),
-                customer.getLastName(),
-                customer.getEmail(),
-                customer.getPhoneNumber(),
-                customer.getCreatedAt(),
-                customer.getLastModified()
-        );
+        CustomerResponseDto dto = new CustomerResponseDto();
+        dto.setId(customer.getId());
+        dto.setFirstName(customer.getFirstName());
+        dto.setLastName(customer.getLastName());
+        dto.setEmail(customer.getEmail());
+        dto.setPhoneNumber(customer.getPhoneNumber());
+        dto.setCreatedAt(customer.getCreatedAt());
+        dto.setLastModified(customer.getLastModified());
+        return dto;
     }
 }
