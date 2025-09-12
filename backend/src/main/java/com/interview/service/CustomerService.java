@@ -29,14 +29,13 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
 
     @Transactional(readOnly = true)
-    public Page<CustomerResponseDto> getAllCustomers(int page, int size, String sortBy, String sortDir,
-                                                   String firstName, String lastName, String email) {
+    public Page<CustomerResponseDto> getAllCustomers(int page, int size, String sortBy, String sortDir) {
         log.info("Fetching active customers - page: {}, size: {}, sortBy: {}, sortDir: {}", page, size, sortBy, sortDir);
         
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         
-        Page<Customer> customers = customerRepository.findCustomersWithFilters(firstName, lastName, email, pageable);
+        Page<Customer> customers = customerRepository.findByDeletedFalse(pageable);
         
         log.info("Found {} active customers", customers.getTotalElements());
         return customers.map(this::mapToResponseDto);
@@ -44,7 +43,6 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public Page<CustomerResponseDto> getAllCustomersIncludingDeleted(int page, int size, String sortBy, String sortDir,
-                                                                   String firstName, String lastName, String email, 
                                                                    boolean includeDeleted) {
         log.info("Fetching all customers (includeDeleted: {}) - page: {}, size: {}, sortBy: {}, sortDir: {}", 
                 includeDeleted, page, size, sortBy, sortDir);
@@ -52,7 +50,7 @@ public class CustomerService {
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         
-        Page<Customer> customers = customerRepository.findAllCustomersWithFilters(firstName, lastName, email, includeDeleted, pageable);
+        Page<Customer> customers = customerRepository.findAllCustomers(includeDeleted, pageable);
         
         log.info("Found {} customers (includeDeleted: {})", customers.getTotalElements(), includeDeleted);
         return customers.map(this::mapToResponseDto);

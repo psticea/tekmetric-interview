@@ -36,15 +36,12 @@ public class CustomerController {
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "Page number must be at least 1") int page,
             @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int pageSize,
             @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
-            @RequestParam(defaultValue = "asc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir,
-            @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email) {
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir) {
         
         log.info("GET /api/customers - page: {}, pageSize: {}, sortBy: {}, sortDir: {}", page, pageSize, sortBy, sortDir);
         
         Page<CustomerResponseDto> customers = customerService.getAllCustomers(
-                page - 1, pageSize, sortBy, sortDir, firstName, lastName, email);
+                page - 1, pageSize, sortBy, sortDir);
         
         log.info("Returning {} active customers out of {} total", customers.getNumberOfElements(), customers.getTotalElements());
         return ResponseEntity.ok(customers);
@@ -57,15 +54,12 @@ public class CustomerController {
             @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int pageSize,
             @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
             @RequestParam(defaultValue = "asc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir,
-            @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email,
             @RequestParam(defaultValue = "false") boolean includeDeleted) {
         
         log.info("GET /api/customers/admin/all - page: {}, pageSize: {}, includeDeleted: {}", page, pageSize, includeDeleted);
         
         Page<CustomerResponseDto> customers = customerService.getAllCustomersIncludingDeleted(
-                page - 1, pageSize, sortBy, sortDir, firstName, lastName, email, includeDeleted);
+                page - 1, pageSize, sortBy, sortDir, includeDeleted);
         
         log.info("Returning {} customers out of {} total (includeDeleted: {})", 
                 customers.getNumberOfElements(), customers.getTotalElements(), includeDeleted);

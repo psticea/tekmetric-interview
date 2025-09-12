@@ -24,27 +24,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Page<Customer> findByDeletedFalse(Pageable pageable);
 
-    @Query("SELECT c FROM Customer c WHERE c.deleted = false AND " +
-           "(:firstName IS NULL OR LOWER(c.firstName) LIKE LOWER(CONCAT('%', :firstName, '%'))) AND " +
-           "(:lastName IS NULL OR LOWER(c.lastName) LIKE LOWER(CONCAT('%', :lastName, '%'))) AND " +
-           "(:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%')))")
-    Page<Customer> findCustomersWithFilters(
-            @Param("firstName") String firstName,
-            @Param("lastName") String lastName,
-            @Param("email") String email,
-            Pageable pageable
-    );
 
-    // Admin methods to access all records including deleted ones
-    @Query("SELECT c FROM Customer c WHERE " +
-           "(:firstName IS NULL OR LOWER(c.firstName) LIKE LOWER(CONCAT('%', :firstName, '%'))) AND " +
-           "(:lastName IS NULL OR LOWER(c.lastName) LIKE LOWER(CONCAT('%', :lastName, '%'))) AND " +
-           "(:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND " +
-           "(:includeDeleted = true OR c.deleted = false)")
-    Page<Customer> findAllCustomersWithFilters(
-            @Param("firstName") String firstName,
-            @Param("lastName") String lastName,
-            @Param("email") String email,
+    // Admin method to access all records including deleted ones
+    @Query("SELECT c FROM Customer c WHERE :includeDeleted = true OR c.deleted = false")
+    Page<Customer> findAllCustomers(
             @Param("includeDeleted") boolean includeDeleted,
             Pageable pageable
     );
