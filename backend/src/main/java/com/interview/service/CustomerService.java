@@ -41,20 +41,6 @@ public class CustomerService {
         return customers.map(this::mapToResponseDto);
     }
 
-    @Transactional(readOnly = true)
-    public Page<CustomerResponseDto> getAllCustomersIncludingDeleted(int page, int size, String sortBy, String sortDir,
-                                                                   boolean includeDeleted) {
-        log.info("Fetching all customers (includeDeleted: {}) - page: {}, size: {}, sortBy: {}, sortDir: {}", 
-                includeDeleted, page, size, sortBy, sortDir);
-        
-        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        
-        Page<Customer> customers = customerRepository.findAllCustomers(includeDeleted, pageable);
-        
-        log.info("Found {} customers (includeDeleted: {})", customers.getTotalElements(), includeDeleted);
-        return customers.map(this::mapToResponseDto);
-    }
 
     @Transactional(readOnly = true)
     public CustomerResponseDto getCustomerById(Long id) {

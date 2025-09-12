@@ -2,6 +2,7 @@ package com.interview.controller;
 
 import com.interview.dto.CustomerRequestDto;
 import com.interview.dto.CustomerResponseDto;
+import com.interview.dto.CustomerPageResponseDto;
 import com.interview.security.RequireAdmin;
 import com.interview.service.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class CustomerController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Page<CustomerResponseDto>> getAllCustomers(
+    public ResponseEntity<CustomerPageResponseDto> getAllCustomers(
             @RequestParam(defaultValue = "1") @Min(value = 1, message = "Page number must be at least 1") int page,
             @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int pageSize,
             @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
@@ -44,26 +45,7 @@ public class CustomerController {
                 page - 1, pageSize, sortBy, sortDir);
         
         log.info("Returning {} active customers out of {} total", customers.getNumberOfElements(), customers.getTotalElements());
-        return ResponseEntity.ok(customers);
-    }
-
-    @GetMapping("/admin/all")
-    @RequireAdmin
-    public ResponseEntity<Page<CustomerResponseDto>> getAllCustomersIncludingDeleted(
-            @RequestParam(defaultValue = "1") @Min(value = 1, message = "Page number must be at least 1") int page,
-            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size must not exceed 100") int pageSize,
-            @RequestParam(defaultValue = "id") @Pattern(regexp = "^(id|firstName|lastName|email|phoneNumber|createdAt|updatedAt)$", message = "Invalid sort field") String sortBy,
-            @RequestParam(defaultValue = "asc") @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'") String sortDir,
-            @RequestParam(defaultValue = "false") boolean includeDeleted) {
-        
-        log.info("GET /api/customers/admin/all - page: {}, pageSize: {}, includeDeleted: {}", page, pageSize, includeDeleted);
-        
-        Page<CustomerResponseDto> customers = customerService.getAllCustomersIncludingDeleted(
-                page - 1, pageSize, sortBy, sortDir, includeDeleted);
-        
-        log.info("Returning {} customers out of {} total (includeDeleted: {})", 
-                customers.getNumberOfElements(), customers.getTotalElements(), includeDeleted);
-        return ResponseEntity.ok(customers);
+        return ResponseEntity.ok(CustomerPageResponseDto.of(customers));
     }
 
     @GetMapping("/{id}")
