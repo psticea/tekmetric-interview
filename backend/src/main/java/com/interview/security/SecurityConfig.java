@@ -31,11 +31,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/welcome").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/actuator/info").permitAll()
-                // Secure Swagger documentation - Admin only
+                // Secure Swagger documentation - Admin only (Default SpringDoc paths)
                 .requestMatchers("/swagger-ui/**").hasRole("ADMIN")
-                .requestMatchers("/api-docs/**").hasRole("ADMIN")
-                .requestMatchers("/v3/api-docs/**").hasRole("ADMIN")
                 .requestMatchers("/swagger-ui.html").hasRole("ADMIN")
+                .requestMatchers("/v3/api-docs/**").hasRole("ADMIN")
                 // API endpoints
                 .requestMatchers(HttpMethod.GET, "/api/v1/customers/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/customers").hasRole("ADMIN")

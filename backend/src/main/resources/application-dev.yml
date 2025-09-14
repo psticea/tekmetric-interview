@@ -43,12 +43,8 @@ server:
 
 # OpenAPI Configuration (Enabled in Development)
 springdoc:
-  api-docs:
-    path: /api-docs
   swagger-ui:
-    path: /swagger-ui.html
-    operationsSorter: method
-  show-actuator: true
+    enabled: true
 
 # Actuator Configuration
 management:
