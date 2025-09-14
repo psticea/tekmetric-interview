@@ -26,6 +26,9 @@ spring:
       name: admin
       password: admin
       roles: ADMIN
+  boot:
+    admin:
+      context-path: /admin
 
 # Logging Configuration
 logging:
@@ -35,7 +38,7 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{correlationId:-}] %logger{36} - %msg%n"
 
 # Server Configuration
 server:
@@ -51,7 +54,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: "*"
   endpoint:
     health:
       show-details: always

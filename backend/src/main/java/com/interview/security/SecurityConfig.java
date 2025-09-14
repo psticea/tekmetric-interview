@@ -31,6 +31,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/welcome").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/actuator/info").permitAll()
+                // Spring Boot Admin endpoints - Admin only
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/actuator/**").hasRole("ADMIN")
                 // Secure Swagger documentation - Admin only (Default SpringDoc paths)
                 .requestMatchers("/swagger-ui/**").hasRole("ADMIN")
                 .requestMatchers("/swagger-ui.html").hasRole("ADMIN")

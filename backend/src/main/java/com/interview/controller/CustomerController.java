@@ -40,6 +40,16 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    /**
+     * Retrieves a paginated list of all active customers with optional sorting.
+     * 
+     * @param page The page number (1-based) to retrieve. Must be >= 1.
+     * @param pageSize The number of customers per page. Must be between 1 and 100.
+     * @param sortBy The field to sort by. Valid values: id, firstName, lastName, email, phoneNumber, createdAt, updatedAt.
+     * @param sortDir The sort direction. Valid values: asc, desc.
+     * @return A ResponseEntity containing the paginated customer data and metadata.
+     * @throws AccessDeniedException if the user lacks USER or ADMIN role.
+     */
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get all customers", description = "Retrieve a paginated list of all active customers with sorting options")
@@ -69,6 +79,14 @@ public class CustomerController {
         return ResponseEntity.ok(CustomerPageResponseDto.of(customers));
     }
 
+    /**
+     * Retrieves a specific customer by their unique identifier.
+     * 
+     * @param id The unique identifier of the customer. Must be a positive number.
+     * @return A ResponseEntity containing the customer data if found.
+     * @throws CustomerNotFoundException if no active customer exists with the given ID.
+     * @throws AccessDeniedException if the user lacks USER or ADMIN role.
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get customer by ID", description = "Retrieve a specific customer by their unique identifier")
@@ -91,6 +109,15 @@ public class CustomerController {
         return ResponseEntity.ok(customer);
     }
 
+    /**
+     * Creates a new customer with the provided information.
+     * 
+     * @param request The customer data for creation. Must contain valid firstName, lastName, 
+     *                email, and optional phoneNumber. Email must be unique among active customers.
+     * @return A ResponseEntity containing the created customer data with generated ID and timestamps.
+     * @throws DuplicateEmailException if a customer with the same email already exists.
+     * @throws AccessDeniedException if the user lacks ADMIN role.
+     */
     @PostMapping
     @RequireAdmin
     @Operation(summary = "Create new customer", description = "Create a new customer with the provided information")
@@ -113,6 +140,18 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(customer);
     }
 
+    /**
+     * Updates an existing customer's information.
+     * 
+     * @param id The unique identifier of the customer to update. Must be a positive number.
+     * @param request The updated customer data. Must contain valid firstName, lastName, 
+     *                email, and optional phoneNumber. Email must be unique among active customers
+     *                (excluding the customer being updated).
+     * @return A ResponseEntity containing the updated customer data with new lastModified timestamp.
+     * @throws CustomerNotFoundException if no active customer exists with the given ID.
+     * @throws DuplicateEmailException if another customer already uses the provided email.
+     * @throws AccessDeniedException if the user lacks ADMIN role.
+     */
     @PutMapping("/{id}")
     @RequireAdmin
     @Operation(summary = "Update customer", description = "Update an existing customer's information")
@@ -139,6 +178,15 @@ public class CustomerController {
         return ResponseEntity.ok(customer);
     }
 
+    /**
+     * Performs a soft delete of a customer by marking them as deleted.
+     * The customer record is preserved in the database but excluded from normal queries.
+     * 
+     * @param id The unique identifier of the customer to delete. Must be a positive number.
+     * @return A ResponseEntity with no content (204 No Content) if deletion is successful.
+     * @throws CustomerNotFoundException if no active customer exists with the given ID.
+     * @throws AccessDeniedException if the user lacks ADMIN role.
+     */
     @DeleteMapping("/{id}")
     @RequireAdmin
     @Operation(summary = "Delete customer", description = "Soft delete a customer by their ID")

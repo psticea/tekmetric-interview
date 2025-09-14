@@ -28,6 +28,15 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
 
+    /**
+     * Retrieves a paginated list of active customers with optional sorting.
+     * 
+     * @param page The page number (0-based) to retrieve.
+     * @param size The number of customers per page.
+     * @param sortBy The field to sort by (id, firstName, lastName, email, phoneNumber, createdAt, updatedAt).
+     * @param sortDir The sort direction (asc or desc).
+     * @return A Page containing CustomerResponseDto objects for active customers.
+     */
     @Transactional(readOnly = true)
     public Page<CustomerResponseDto> getAllCustomers(int page, int size, String sortBy, String sortDir) {
         log.info("Fetching active customers - page: {}, size: {}, sortBy: {}, sortDir: {}", page, size, sortBy, sortDir);
@@ -42,6 +51,13 @@ public class CustomerService {
     }
 
 
+    /**
+     * Retrieves a specific active customer by their unique identifier.
+     * 
+     * @param id The unique identifier of the customer.
+     * @return A CustomerResponseDto containing the customer's information.
+     * @throws CustomerNotFoundException if no active customer exists with the given ID.
+     */
     @Transactional(readOnly = true)
     public CustomerResponseDto getCustomerById(Long id) {
         log.info("Fetching active customer with id: {}", id);
@@ -53,6 +69,13 @@ public class CustomerService {
         return mapToResponseDto(customer);
     }
 
+    /**
+     * Creates a new customer with the provided information.
+     * 
+     * @param request The customer data containing firstName, lastName, email, and optional phoneNumber.
+     * @return A CustomerResponseDto containing the created customer's information with generated ID and timestamps.
+     * @throws DuplicateEmailException if a customer with the same email already exists and is active.
+     */
     public CustomerResponseDto createCustomer(CustomerRequestDto request) {
         log.info("Creating new customer with email: {}", request.getEmail());
         
@@ -73,6 +96,15 @@ public class CustomerService {
         return mapToResponseDto(savedCustomer);
     }
 
+    /**
+     * Updates an existing customer's information.
+     * 
+     * @param id The unique identifier of the customer to update.
+     * @param request The updated customer data containing firstName, lastName, email, and optional phoneNumber.
+     * @return A CustomerResponseDto containing the updated customer's information with new lastModified timestamp.
+     * @throws CustomerNotFoundException if no active customer exists with the given ID.
+     * @throws DuplicateEmailException if another active customer already uses the provided email address.
+     */
     public CustomerResponseDto updateCustomer(Long id, CustomerRequestDto request) {
         log.info("Updating customer with id: {}", id);
         
@@ -97,6 +129,13 @@ public class CustomerService {
         return mapToResponseDto(savedCustomer);
     }
 
+    /**
+     * Performs a soft delete of a customer by marking them as deleted.
+     * The customer record is preserved in the database but will be excluded from normal queries.
+     * 
+     * @param id The unique identifier of the customer to delete.
+     * @throws CustomerNotFoundException if no active customer exists with the given ID.
+     */
     public void deleteCustomer(Long id) {
         log.info("Soft deleting customer with id: {}", id);
         
