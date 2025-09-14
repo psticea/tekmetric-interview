@@ -29,6 +29,16 @@ spring:
   boot:
     admin:
       context-path: /admin
+      client:
+        url: http://localhost:8080
+        username: admin
+        password: admin
+        instance:
+          name: Customer Management API
+          service-url: http://localhost:8080
+          management-url: http://localhost:8080/actuator
+        auto-registration: true
+        register-once: true
 
 # Logging Configuration
 logging:
@@ -37,6 +47,8 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    de.codecentric.boot.admin: DEBUG
+    org.springframework.boot.actuate: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{correlationId:-}] %logger{36} - %msg%n"
 
