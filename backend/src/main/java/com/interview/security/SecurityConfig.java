@@ -29,10 +29,18 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/welcome").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/customers/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/customers").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/customers/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/customers/**").hasRole("ADMIN")
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/info").permitAll()
+                // Secure Swagger documentation - Admin only
+                .requestMatchers("/swagger-ui/**").hasRole("ADMIN")
+                .requestMatchers("/api-docs/**").hasRole("ADMIN")
+                .requestMatchers("/v3/api-docs/**").hasRole("ADMIN")
+                .requestMatchers("/swagger-ui.html").hasRole("ADMIN")
+                // API endpoints
+                .requestMatchers(HttpMethod.GET, "/api/v1/customers/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/customers").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/customers/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .httpBasic(httpBasic -> {})

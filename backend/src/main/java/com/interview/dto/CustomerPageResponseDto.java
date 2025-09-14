@@ -1,5 +1,6 @@
 package com.interview.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,16 +14,34 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Paginated customer response")
 public class CustomerPageResponseDto {
     
+    @Schema(description = "List of customers")
     private List<CustomerResponseDto> customers;
+    
+    @Schema(description = "Current page number (0-based)", example = "0")
     private int page;
+    
+    @Schema(description = "Page size", example = "10")
     private int size;
+    
+    @Schema(description = "Total number of elements", example = "100")
     private long totalElements;
+    
+    @Schema(description = "Total number of pages", example = "10")
     private int totalPages;
+    
+    @Schema(description = "Whether this is the first page", example = "true")
     private boolean first;
+    
+    @Schema(description = "Whether this is the last page", example = "false")
     private boolean last;
+    
+    @Schema(description = "Whether there is a next page", example = "true")
     private boolean hasNext;
+    
+    @Schema(description = "Whether there is a previous page", example = "false")
     private boolean hasPrevious;
     
     /**
