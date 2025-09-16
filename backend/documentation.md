@@ -1,5 +1,20 @@
 # Customer Management API Documentation
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Architecture Overview](#architecture-overview)
+3. [API Flow Diagram](#api-flow-diagram)
+4. [Database Schema](#database-schema)
+5. [Security Architecture](#security-architecture)
+6. [API Endpoints](#api-endpoints)
+7. [Monitoring and Observability](#monitoring-and-observability)
+8. [Configuration Profiles](#configuration-profiles)
+9. [Error Handling Flow](#error-handling-flow)
+10. [Key Features](#key-features)
+11. [Quick Start](#quick-start)
+12. [Best Practices Implemented](#best-practices-implemented)
+
 ## Overview
 
 A RESTful Customer Management API built with Spring Boot 3.3.4 featuring CRUD operations, security, validation, pagination, and comprehensive documentation.
@@ -123,7 +138,7 @@ graph TD
 | GET | `/api/v1/customers/{id}` | Get customer by ID | USER, ADMIN | None | CustomerResponseDto |
 | POST | `/api/v1/customers` | Create new customer | ADMIN | CustomerRequestDto | CustomerResponseDto |
 | PUT | `/api/v1/customers/{id}` | Update customer | ADMIN | CustomerRequestDto | CustomerResponseDto |
-| DELETE | `/api/v1/customers/{id}` | Soft delete customer | ADMIN | None | 204 No Content |
+| DELETE | `/api/v1/customers/{id}` | Soft delete customer | ADMIN | None | 200 OK |
 
 ### System Endpoints
 
@@ -133,37 +148,15 @@ graph TD
 | GET | `/actuator/health` | Health check | Public |
 | GET | `/actuator/info` | Application info | Public |
 | GET | `/swagger-ui.html` | API documentation | ADMIN |
-| GET | `/admin` | Spring Boot Admin | ADMIN |
+| GET | `/admin` | Spring Boot Admin (dev only) | ADMIN |
 | GET | `/h2-console` | Database console | Public (dev only) |
 
-## Request/Response Flow
-
-```mermaid
-graph LR
-    subgraph "Request Processing"
-        A[HTTP Request] --> B[Request Logging Filter]
-        B --> C[Spring Security]
-        C --> D[Input Validation]
-        D --> E[Controller Method]
-        E --> F[Service Layer]
-        F --> G[Repository Layer]
-        G --> H[Database]
-    end
-    
-    subgraph "Response Processing"
-        H --> I[Entity Mapping]
-        I --> J[DTO Creation]
-        J --> K[Response Headers]
-        K --> L[Response Logging]
-        L --> M[HTTP Response]
-    end
-```
 
 ## Monitoring and Observability
 
 ```mermaid
 graph TD
-    App[Customer Management API] --> Metrics[Micrometer Metrics]
+    App[Customer Management API] --> Metrics[Basic Metrics]
     App --> Logs[Structured Logging]
     App --> Health[Health Checks]
     Metrics --> Actuator[Spring Boot Actuator]
@@ -180,20 +173,9 @@ graph TD
 
 ## Configuration Profiles
 
-```mermaid
-graph TD
-    Profiles[Configuration Profiles] --> Dev[Development Profile]
-    Profiles --> Prod[Production Profile]
-    Profiles --> Test[Test Profile]
-    
-    Dev --> DevFeatures[Debug Logging, H2 Console, Swagger UI, Admin Dashboard]
-    Prod --> ProdFeatures[Info Logging, File-based H2, No Swagger, Secure Admin]
-    Test --> TestFeatures[Minimal Logging, In-memory H2, No External Services]
-    
-    DevFeatures --> DevDB[(H2 In-Memory)]
-    ProdFeatures --> ProdDB[(H2 File-based)]
-    TestFeatures --> TestDB[(H2 Test)]
-```
+- **Development**: Debug logging, H2 console, Swagger UI, Admin dashboard
+- **Production**: Info logging, file-based H2, no Swagger, context path `/api`
+- **Test**: Minimal logging, in-memory H2, no external services
 
 ## Error Handling Flow
 
@@ -221,25 +203,6 @@ graph TD
     GlobalHandler --> FormattedError[Formatted Error Response]
 ```
 
-## Deployment Architecture
-
-```mermaid
-graph TB
-    subgraph "Container Environment"
-        Docker[Docker Container] --> App[Customer API :8080]
-        Docker --> H2[H2 Database]
-    end
-    
-    subgraph "External Access"
-        Client[Client Applications] --> Port8080[Port 8080]
-    end
-    
-    Port8080 --> App
-    
-    subgraph "Data Persistence"
-        App --> H2
-    end
-```
 
 ## Key Features
 
@@ -252,19 +215,20 @@ graph TB
 ## Quick Start
 
 ```bash
-# Start the application
-mvn spring-boot:run
+# Build and run the application
+mvn clean package
+java -jar target/interview-1.0-SNAPSHOT.jar
 
-# Or with Docker
-docker-compose up
+# Or run directly with Maven
+mvn spring-boot:run
 ```
 
 ### Access Points
 - **API**: http://localhost:8080/api/v1/customers
 - **Swagger UI**: http://localhost:8080/swagger-ui.html (admin required)
-- **Admin Dashboard**: http://localhost:8081/admin (admin required)
+- **Admin Dashboard**: http://localhost:8081/admin (admin required, dev only)
 - **Health Check**: http://localhost:8080/actuator/health
-- **H2 Console**: http://localhost:8080/h2-console
+- **H2 Console**: http://localhost:8080/h2-console (dev only)
 
 ### Authentication
 - **Admin**: `admin` / `admin` (full access)
@@ -350,7 +314,7 @@ This section details the 20 Spring Boot best practices implemented in this proje
 - **How to Verify**: Access `http://localhost:8080/actuator/health` to see application health status
 
 ### 16. Spring Boot Admin Monitoring
-- **Implementation**: Spring Boot Admin Server configuration for application monitoring, metrics collection, and centralized management
+- **Implementation**: Spring Boot Admin Server configuration for application monitoring and centralized management of basic metrics
 - **Why Important**: Provides operational insights, enables proactive issue detection, and improves system observability
 - **How to Verify**: Access admin dashboard at `http://localhost:8081/admin` (admin credentials required)
 
@@ -365,7 +329,7 @@ This section details the 20 Spring Boot best practices implemented in this proje
 - **How to Verify**: Check different YAML files for environment-specific settings and run with `--spring.profiles.active=dev|prod|test`
 
 ### 19. Docker Containerization
-- **Implementation**: `Dockerfile` for application containerization and `docker-compose.yml` for easy deployment with H2 database
+- **Implementation**: `Dockerfile` with Maven build process and `docker-compose.yml` for easy deployment with H2 database
 - **Why Important**: Ensures consistent deployments, simplifies environment setup, and supports modern DevOps practices
 - **How to Verify**: Run `docker-compose up --build` to start the containerized application at `http://localhost:8080`
 
