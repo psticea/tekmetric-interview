@@ -59,7 +59,7 @@ class CustomerIntegrationTest {
     @Test
     void customerLifecycleShouldWorkEndToEndThroughRestApi() throws Exception {
         // 1. Create customer (requires admin)
-        MvcResult createResult = mockMvc.perform(post("/api/customers")
+        MvcResult createResult = mockMvc.perform(post("/api/v1/customers")
                 .header("Authorization", createAuthHeader("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validCustomerRequest)))
@@ -75,7 +75,7 @@ class CustomerIntegrationTest {
         assertNotNull(customerId);
 
         // 2. Retrieve customer (user can access)
-        mockMvc.perform(get("/api/customers/{id}", customerId)
+        mockMvc.perform(get("/api/v1/customers/{id}", customerId)
                 .header("Authorization", createAuthHeader("user", "password")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(customerId))
@@ -89,7 +89,7 @@ class CustomerIntegrationTest {
         updateRequest.setEmail("jane.smith@integration-test.com");
         updateRequest.setPhoneNumber("9876543210");
 
-        mockMvc.perform(put("/api/customers/{id}", customerId)
+        mockMvc.perform(put("/api/v1/customers/{id}", customerId)
                 .header("Authorization", createAuthHeader("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
@@ -98,12 +98,12 @@ class CustomerIntegrationTest {
                 .andExpect(jsonPath("$.email").value("jane.smith@integration-test.com"));
 
         // 4. Delete customer (requires admin)
-        mockMvc.perform(delete("/api/customers/{id}", customerId)
+        mockMvc.perform(delete("/api/v1/customers/{id}", customerId)
                 .header("Authorization", createAuthHeader("admin", "admin")))
                 .andExpect(status().isNoContent());
 
         // 5. Verify customer is deleted (should return 404)
-        mockMvc.perform(get("/api/customers/{id}", customerId)
+        mockMvc.perform(get("/api/v1/customers/{id}", customerId)
                 .header("Authorization", createAuthHeader("user", "password")))
                 .andExpect(status().isNotFound());
     }
@@ -112,7 +112,7 @@ class CustomerIntegrationTest {
     @Test
     void duplicateEmailValidationShouldWorkAcrossFullStack() throws Exception {
         // Create first customer
-        mockMvc.perform(post("/api/customers")
+        mockMvc.perform(post("/api/v1/customers")
                 .header("Authorization", createAuthHeader("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validCustomerRequest)))
@@ -125,7 +125,7 @@ class CustomerIntegrationTest {
         duplicateRequest.setEmail("john.doe@integration-test.com"); // Same email
         duplicateRequest.setPhoneNumber("9876543210");
 
-        MvcResult errorResult = mockMvc.perform(post("/api/customers")
+        MvcResult errorResult = mockMvc.perform(post("/api/v1/customers")
                 .header("Authorization", createAuthHeader("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(duplicateRequest)))
@@ -151,7 +151,7 @@ class CustomerIntegrationTest {
             request.setEmail("customer" + i + "@pagination-test.com");
             request.setPhoneNumber("123456789" + (i % 10));
 
-            mockMvc.perform(post("/api/customers")
+            mockMvc.perform(post("/api/v1/customers")
                     .header("Authorization", createAuthHeader("admin", "admin"))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
@@ -159,7 +159,7 @@ class CustomerIntegrationTest {
         }
 
         // Test first page with pagination
-        MvcResult firstPageResult = mockMvc.perform(get("/api/customers")
+        MvcResult firstPageResult = mockMvc.perform(get("/api/v1/customers")
                 .param("page", "1")
                 .param("pageSize", "5")
                 .param("sortBy", "firstName")
@@ -187,22 +187,22 @@ class CustomerIntegrationTest {
     @Test
     void securityRulesShouldBeEnforcedAcrossAllEndpoints() throws Exception {
         // Test unauthorized access
-        mockMvc.perform(get("/api/customers"))
+        mockMvc.perform(get("/api/v1/customers"))
                 .andExpect(status().isUnauthorized());
 
         // Test user can read but not create/update/delete
-        mockMvc.perform(get("/api/customers")
+        mockMvc.perform(get("/api/v1/customers")
                 .header("Authorization", createAuthHeader("user", "password")))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/customers")
+        mockMvc.perform(post("/api/v1/customers")
                 .header("Authorization", createAuthHeader("user", "password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validCustomerRequest)))
                 .andExpect(status().isForbidden());
 
         // Create a customer with admin for further security tests
-        MvcResult createResult = mockMvc.perform(post("/api/customers")
+        MvcResult createResult = mockMvc.perform(post("/api/v1/customers")
                 .header("Authorization", createAuthHeader("admin", "admin"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validCustomerRequest)))
@@ -213,13 +213,13 @@ class CustomerIntegrationTest {
         CustomerResponseDto customer = objectMapper.readValue(responseBody, CustomerResponseDto.class);
 
         // Test user cannot update or delete
-        mockMvc.perform(put("/api/customers/{id}", customer.getId())
+        mockMvc.perform(put("/api/v1/customers/{id}", customer.getId())
                 .header("Authorization", createAuthHeader("user", "password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validCustomerRequest)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(delete("/api/customers/{id}", customer.getId())
+        mockMvc.perform(delete("/api/v1/customers/{id}", customer.getId())
                 .header("Authorization", createAuthHeader("user", "password")))
                 .andExpect(status().isForbidden());
     }
@@ -228,7 +228,7 @@ class CustomerIntegrationTest {
     @Test
     void edgeCasesShouldReturnProperErrors() throws Exception {
         // Test non-existent customer
-        mockMvc.perform(get("/api/customers/99999")
+        mockMvc.perform(get("/api/v1/customers/99999")
                 .header("Authorization", createAuthHeader("user", "password")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
@@ -236,12 +236,12 @@ class CustomerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Customer not found with id: 99999"));
 
         // Test invalid pagination parameters
-        mockMvc.perform(get("/api/customers")
+        mockMvc.perform(get("/api/v1/customers")
                 .param("page", "0") // Should be at least 1
                 .header("Authorization", createAuthHeader("user", "password")))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(get("/api/customers")
+        mockMvc.perform(get("/api/v1/customers")
                 .param("sortBy", "invalidField") // Invalid sort field
                 .header("Authorization", createAuthHeader("user", "password")))
                 .andExpect(status().isBadRequest());

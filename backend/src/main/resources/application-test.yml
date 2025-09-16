@@ -13,20 +13,7 @@ spring:
         format_sql: false
   sql:
     init:
-      mode: never
-  security:
-    user:
-      name: test
-      password: test
-      roles: ADMIN
-    users[0]:
-      name: user
-      password: password
-      roles: USER
-    users[1]:
-      name: admin
-      password: admin
-      roles: ADMIN
+      mode: always
 
 # Logging Configuration (Test-specific)
 logging:

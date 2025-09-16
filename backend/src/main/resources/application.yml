@@ -20,19 +20,6 @@ spring:
       mode: always
       data-locations: classpath:database/data.sql
   
-  # Security Configuration (Common)
-  security:
-    user:
-      name: admin
-      password: admin
-      roles: ADMIN
-    users:
-      - name: user
-        password: password
-        roles: USER
-      - name: admin
-        password: admin
-        roles: ADMIN
 
 # Application Information
 info:
