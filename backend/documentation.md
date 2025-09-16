@@ -21,9 +21,9 @@
 The API provides a complete customer data management solution with soft deletes and comprehensive documentation. A RESTful Customer Management API built with Spring Boot 3.3.4 featuring CRUD operations, security, validation, and pagination. This project demonstrates modern Spring Boot best practices including:
 
 - **Security**: Role-based access control with USER/ADMIN authentication
-- **Monitoring**: Health checks, basic metrics, and Spring Boot Admin dashboard
+- **Monitoring**: Health checks and basic metrics
 - **Documentation**: OpenAPI 3.0 with Swagger UI and comprehensive Javadoc
-- **Observability**: Structured logging and request/response tracking
+- **Observability**: Structured logging, request/response tracking, and correlation ID tracing
 - **Production Ready**: Configuration profiles, Docker support, and audit trails
 
 ## 2. Architecture & Design
@@ -41,12 +41,9 @@ graph TB
     
     API --> Actuator[Spring Boot Actuator]
     API --> Swagger[OpenAPI/Swagger]
-    API --> Admin[Spring Boot Admin]
-    
     subgraph "Monitoring & Documentation"
         Actuator
         Swagger
-        Admin
     end
     
     subgraph "Security Layer"
@@ -166,19 +163,22 @@ graph TD
 
 ```mermaid
 graph TD
-    App[Customer Management API] --> Metrics[Basic Metrics]
-    App --> Logs[Structured Logging]
-    App --> Health[Health Checks]
-    Metrics --> Actuator[Spring Boot Actuator]
-    Logs --> LogFile[application.log]
-    Health --> HealthEndpoint[Health Endpoint]
+    App[Customer Management API] --> Actuator[Spring Boot Actuator]
+    App --> Logs[Request Logging Filter]
+    Actuator --> HealthEndpoint[Health Endpoint /actuator/health]
+    Actuator --> MetricsEndpoint[Metrics Endpoint /actuator/metrics]
     
-    Actuator --> AdminUI[Spring Boot Admin UI]
-    LogFile --> LogAggregation[Log Aggregation Systems]
-    HealthEndpoint --> Monitoring[External Monitoring]
+    Logs --> LogFile[Application Logs]
     
-    AdminUI --> Dashboard[Admin Dashboard Port 8081]
-    Dashboard --> Alerts[Application Monitoring]
+    subgraph "Available Endpoints"
+        HealthEndpoint
+        MetricsEndpoint
+    end
+    
+    subgraph "Logging"
+        Logs
+        LogFile
+    end
 ```
 
 ### 4.2 Configuration Profiles
@@ -228,7 +228,6 @@ mvn spring-boot:run
 ### Access Points
 - **API**: http://localhost:8080/api/v1/customers
 - **Swagger UI**: http://localhost:8080/swagger-ui.html (admin required)
-- **Admin Dashboard**: http://localhost:8081/admin (admin required, dev only)
 - **Health Check**: http://localhost:8080/actuator/health
 - **H2 Console**: http://localhost:8080/h2-console (dev only)
 
@@ -315,10 +314,10 @@ This section details the 20 Spring Boot best practices implemented in this proje
 - **Why Important**: Enables monitoring systems to detect application issues and provides operational visibility
 - **How to Verify**: Access `http://localhost:8080/actuator/health` to see application health status
 
-### 16. Spring Boot Admin Monitoring
-- **Implementation**: Spring Boot Admin Server configuration for application monitoring and centralized management of basic metrics
-- **Why Important**: Provides operational insights, enables proactive issue detection, and improves system observability
-- **How to Verify**: Access admin dashboard at `http://localhost:8081/admin` (admin credentials required)
+### 16. Correlation ID Tracking
+- **Implementation**: `CorrelationIdFilter` generates unique correlation IDs for each request, adds them to response headers, and includes them in structured logging
+- **Why Important**: Enables request tracing across distributed systems, improves debugging capabilities, and provides end-to-end visibility
+- **How to Verify**: Make API calls and check response headers for `X-Correlation-ID`, or examine logs for correlation ID patterns
 
 ### 17. API Versioning
 - **Implementation**: All endpoints use `/api/v1/` prefix for versioning, enabling future API evolution without breaking existing clients

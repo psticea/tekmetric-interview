@@ -1,17 +1,16 @@
 package com.interview.config;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Filter for logging HTTP requests and responses for audit and debugging purposes.
@@ -55,10 +54,11 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         String queryString = request.getQueryString();
         String userAgent = request.getHeader("User-Agent");
         String remoteAddr = getClientIP(request);
+        String correlationId = request.getHeader("X-Correlation-ID");
 
-        log.info("HTTP Request: {} {} {} | Remote: {} | User-Agent: {}",
+        log.info("HTTP Request: {} {} {} | Remote: {} | User-Agent: {} | Correlation-ID: {}",
                 method, uri, queryString != null ? "?" + queryString : "",
-                remoteAddr, userAgent);
+                remoteAddr, userAgent, correlationId);
     }
 
     private void logResponse(ContentCachingResponseWrapper response, long duration) {

@@ -15,19 +15,6 @@ spring:
     console:
       enabled: true
       path: /h2-console
-  boot:
-    admin:
-      context-path: /admin
-      client:
-        url: http://localhost:8080
-        username: admin
-        password: admin
-        instance:
-          name: Customer Management API
-          service-url: http://localhost:8080
-          management-url: http://localhost:8080/actuator
-        auto-registration: true
-        register-once: true
 
 # Logging Configuration (Dev-specific)
 logging:
