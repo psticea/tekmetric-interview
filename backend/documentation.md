@@ -2,29 +2,37 @@
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Architecture Overview](#architecture-overview)
-3. [API Flow Diagram](#api-flow-diagram)
-4. [Database Schema](#database-schema)
-5. [Security Architecture](#security-architecture)
-6. [API Endpoints](#api-endpoints)
-7. [Monitoring and Observability](#monitoring-and-observability)
-8. [Configuration Profiles](#configuration-profiles)
-9. [Error Handling Flow](#error-handling-flow)
-10. [Key Features](#key-features)
-11. [Quick Start](#quick-start)
-12. [Best Practices Implemented](#best-practices-implemented)
+1. [Overview](#1-overview)
+2. [Architecture & Design](#2-architecture--design)
+   - [2.1 Architecture Overview](#21-architecture-overview)
+   - [2.2 API Flow](#22-api-flow)
+   - [2.3 Database Schema](#23-database-schema)
+   - [2.4 Security Architecture](#24-security-architecture)
+3. [API Documentation](#3-api-documentation)
+4. [System Features](#4-system-features)
+   - [4.1 Monitoring and Observability](#41-monitoring-and-observability)
+   - [4.2 Configuration Profiles](#42-configuration-profiles)
+   - [4.3 Error Handling](#43-error-handling)
+5. [Getting Started](#5-getting-started)
+6. [Best Practices](#6-best-practices)
 
-## Overview
+## 1. Overview
 
-A RESTful Customer Management API built with Spring Boot 3.3.4 featuring CRUD operations, security, validation, pagination, and comprehensive documentation.
+The API provides a complete customer data management solution with soft deletes and comprehensive documentation. A RESTful Customer Management API built with Spring Boot 3.3.4 featuring CRUD operations, security, validation, and pagination. This project demonstrates modern Spring Boot best practices including:
 
-## Architecture Overview
+- **Security**: Role-based access control with USER/ADMIN authentication
+- **Monitoring**: Health checks, basic metrics, and Spring Boot Admin dashboard
+- **Documentation**: OpenAPI 3.0 with Swagger UI and comprehensive Javadoc
+- **Observability**: Structured logging and request/response tracking
+- **Production Ready**: Configuration profiles, Docker support, and audit trails
+
+## 2. Architecture & Design
+
+### 2.1 Architecture Overview
 
 ```mermaid
 graph TB
-    Client[Client Applications] --> LB[Load Balancer]
-    LB --> API[Customer Management API]
+    Client[Client Applications] --> API[Customer Management API]
     API --> Security[Spring Security]
     Security --> Controller[CustomerController]
     Controller --> Service[CustomerService]
@@ -54,7 +62,7 @@ graph TB
     end
 ```
 
-## API Flow Diagram
+### 2.2 API Flow
 
 ```mermaid
 sequenceDiagram
@@ -86,7 +94,7 @@ sequenceDiagram
     F-->>C: HTTP Response
 ```
 
-## Database Schema
+### 2.3 Database Schema
 
 ```mermaid
 erDiagram
@@ -102,7 +110,7 @@ erDiagram
     }
 ```
 
-## Security Architecture
+### 2.4 Security Architecture
 
 ```mermaid
 graph TD
@@ -128,7 +136,7 @@ graph TD
     Denied --> Error403[403 Forbidden]
 ```
 
-## API Endpoints
+## 3. API Documentation
 
 ### Customer Management
 
@@ -152,7 +160,9 @@ graph TD
 | GET | `/h2-console` | Database console | Public (dev only) |
 
 
-## Monitoring and Observability
+## 4. System Features
+
+### 4.1 Monitoring and Observability
 
 ```mermaid
 graph TD
@@ -171,13 +181,13 @@ graph TD
     Dashboard --> Alerts[Application Monitoring]
 ```
 
-## Configuration Profiles
+### 4.2 Configuration Profiles
 
 - **Development**: Debug logging, H2 console, Swagger UI, Admin dashboard
 - **Production**: Info logging, file-based H2, no Swagger, context path `/api`
 - **Test**: Minimal logging, in-memory H2, no external services
 
-## Error Handling Flow
+### 4.3 Error Handling
 
 ```mermaid
 graph TD
@@ -204,15 +214,7 @@ graph TD
 ```
 
 
-## Key Features
-
-- **🔐 Security**: Basic Auth with role-based access control (USER/ADMIN)
-- **📊 Monitoring**: Health checks, basic metrics, and Spring Boot Admin dashboard
-- **📝 Documentation**: OpenAPI 3.0 with Swagger UI and comprehensive Javadoc
-- **🔍 Observability**: Structured logging and request/response tracking
-- **🚀 Production Ready**: Configuration profiles, Docker support, and audit trails
-
-## Quick Start
+## 5. Getting Started
 
 ```bash
 # Build and run the application
@@ -234,7 +236,7 @@ mvn spring-boot:run
 - **Admin**: `admin` / `admin` (full access)
 - **User**: `user` / `password` (read-only)
 
-## Best Practices Implemented
+## 6. Best Practices
 
 This section details the 20 Spring Boot best practices implemented in this project, providing comprehensive explanations, importance, and verification methods.
 
