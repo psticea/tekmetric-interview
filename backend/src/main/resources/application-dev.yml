@@ -50,7 +50,7 @@ logging:
     de.codecentric.boot.admin: DEBUG
     org.springframework.boot.actuate: DEBUG
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{correlationId:-}] %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 # Server Configuration
 server:

@@ -51,9 +51,9 @@ sequenceDiagram
     participant Repo as CustomerRepository
     participant DB as H2 Database
 
-    C->>F: HTTP Request with/without Correlation ID
-    F->>F: Generate/Extract Correlation ID
-    F->>S: Request with Correlation ID in MDC
+    C->>F: HTTP Request
+    F->>F: Log Request Details
+    F->>S: Request
     S->>S: Authenticate & Authorize
     S->>Ctrl: Authorized Request
     Ctrl->>Ctrl: Validate Input Parameters
@@ -68,7 +68,7 @@ sequenceDiagram
     Ctrl-->>S: HTTP Response
     S-->>F: Response with Headers
     F->>F: Log Request/Response
-    F-->>C: HTTP Response with Correlation ID
+    F-->>C: HTTP Response
 ```
 
 ## Database Schema
@@ -141,22 +141,21 @@ graph TD
 ```mermaid
 graph LR
     subgraph "Request Processing"
-        A[HTTP Request] --> B[Correlation ID Filter]
-        B --> C[Request Logging Filter]
-        C --> D[Spring Security]
-        D --> E[Input Validation]
-        E --> F[Controller Method]
-        F --> G[Service Layer]
-        G --> H[Repository Layer]
-        H --> I[Database]
+        A[HTTP Request] --> B[Request Logging Filter]
+        B --> C[Spring Security]
+        C --> D[Input Validation]
+        D --> E[Controller Method]
+        E --> F[Service Layer]
+        F --> G[Repository Layer]
+        G --> H[Database]
     end
     
     subgraph "Response Processing"
-        I --> J[Entity Mapping]
-        J --> K[DTO Creation]
-        K --> L[Response Headers]
-        L --> M[Response Logging]
-        M --> N[HTTP Response]
+        H --> I[Entity Mapping]
+        I --> J[DTO Creation]
+        J --> K[Response Headers]
+        K --> L[Response Logging]
+        L --> M[HTTP Response]
     end
 ```
 
@@ -167,17 +166,13 @@ graph TD
     App[Customer Management API] --> Metrics[Micrometer Metrics]
     App --> Logs[Structured Logging]
     App --> Health[Health Checks]
-    App --> Tracing[Request Correlation IDs]
-    
     Metrics --> Actuator[Spring Boot Actuator]
     Logs --> LogFile[application.log]
     Health --> HealthEndpoint[/actuator/health]
-    Tracing --> MDC[Logback MDC]
     
     Actuator --> AdminUI[Spring Boot Admin UI]
     LogFile --> LogAggregation[Log Aggregation Systems]
     HealthEndpoint --> Monitoring[External Monitoring]
-    MDC --> DistributedTracing[Distributed Tracing]
     
     AdminUI --> Dashboard[Admin Dashboard Port 8081]
     Dashboard --> Alerts[Application Monitoring]
@@ -232,26 +227,17 @@ graph TD
 graph TB
     subgraph "Container Environment"
         Docker[Docker Container] --> App[Customer API :8080]
-        Docker --> AdminPort[Admin UI :8081]
         Docker --> H2[H2 Database]
     end
     
     subgraph "External Access"
         Client[Client Applications] --> Port8080[Port 8080]
-        Admin[Administrators] --> Port8081[Port 8081]
     end
     
     Port8080 --> App
-    Port8081 --> AdminPort
-    
-    subgraph "Health Monitoring"
-        HealthCheck[Docker Health Check] --> HealthEndpoint[/actuator/health]
-        HealthEndpoint --> App
-    end
     
     subgraph "Data Persistence"
-        App --> DataVolume[Data Volume]
-        H2 --> DataVolume
+        App --> H2
     end
 ```
 
@@ -267,7 +253,7 @@ graph TB
 - **Health Checks**: Built-in Spring Boot Actuator health indicators
 - **Metrics**: Application metrics via Micrometer
 - **Admin Dashboard**: Spring Boot Admin for application monitoring
-- **Request Tracing**: Correlation IDs for request tracking
+- **Request Logging**: Detailed request/response logging
 
 ### 📝 Documentation
 - **OpenAPI 3.0**: Complete API specification
@@ -276,14 +262,14 @@ graph TB
 - **Architecture Diagrams**: Visual system documentation
 
 ### 🔍 Observability
-- **Structured Logging**: JSON-formatted logs with correlation IDs
-- **Request/Response Logging**: Detailed HTTP request/response logging
+- **Structured Logging**: Detailed application logging
+- **Request/Response Logging**: HTTP request/response logging
 - **Performance Metrics**: Response time and throughput monitoring
 - **Error Tracking**: Comprehensive error logging and handling
 
 ### 🚀 Production Ready
 - **Configuration Profiles**: Environment-specific configurations
-- **Docker Support**: Complete containerization with health checks
+- **Docker Support**: Simple containerization
 - **Database Migration**: SQL scripts for database initialization
 - **Soft Deletes**: Data preservation with logical deletion
 
