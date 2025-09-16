@@ -1,0 +1,65 @@
+# Default Configuration - Use profiles for environment-specific settings
+spring:
+  profiles:
+    active: dev
+  
+  application:
+    name: interview-api
+  
+  # Database Configuration (Common)
+  datasource:
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+  
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:database/data.sql
+  
+  # Security Configuration (Common)
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
+    users:
+      - name: user
+        password: password
+        roles: USER
+      - name: admin
+        password: admin
+        roles: ADMIN
+
+# Application Information
+info:
+  app:
+    name: @project.name@
+    version: @project.version@
+    description: Customer Management API
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging Configuration (Common)
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

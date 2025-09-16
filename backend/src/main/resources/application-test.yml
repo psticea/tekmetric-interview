@@ -1,12 +1,10 @@
-# Test Configuration
+# Test Configuration - Only test-specific overrides
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
     username: sa
     password: password
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
     show-sql: false
@@ -16,34 +14,39 @@ spring:
   sql:
     init:
       mode: never
+  security:
+    user:
+      name: test
+      password: test
+      roles: ADMIN
+    users[0]:
+      name: user
+      password: password
+      roles: USER
+    users[1]:
+      name: admin
+      password: admin
+      roles: ADMIN
 
-# Logging Configuration
+# Logging Configuration (Test-specific)
 logging:
   level:
     com.interview: WARN
     org.springframework.security: WARN
     org.hibernate.SQL: WARN
 
-# Server Configuration
+# Server Configuration (Test-specific)
 server:
   port: 0
 
-# Security Configuration
-spring:
-  security:
-    user:
-      name: test
-      password: test
-      roles: ADMIN
-
-# OpenAPI Configuration
+# OpenAPI Configuration (Disabled in Test)
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
     enabled: false
 
-# Actuator Configuration
+# Actuator Configuration (Test-specific)
 management:
   endpoints:
     web:
