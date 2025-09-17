@@ -19,7 +19,6 @@ spring:
     init:
       mode: always
       data-locations: classpath:database/data.sql
-  
 
 # Application Information
 info:

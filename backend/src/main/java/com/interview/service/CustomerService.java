@@ -50,7 +50,6 @@ public class CustomerService {
         return customers.map(this::mapToResponseDto);
     }
 
-
     /**
      * Retrieves a specific active customer by their unique identifier.
      * 
