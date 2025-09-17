@@ -14,7 +14,8 @@
    - [4.2 Configuration Profiles](#42-configuration-profiles)
    - [4.3 Error Handling](#43-error-handling)
 5. [Getting Started](#5-getting-started)
-6. [Best Practices](#6-best-practices)
+6. [API Demo with cURL](#6-api-demo-with-curl)
+7. [Best Practices](#7-best-practices)
 
 ## 1. Overview
 
@@ -153,7 +154,6 @@ graph TD
 | GET | `/actuator/health` | Health check | Public |
 | GET | `/actuator/info` | Application info | Public |
 | GET | `/swagger-ui.html` | API documentation | ADMIN |
-| GET | `/admin` | Spring Boot Admin (dev only) | ADMIN |
 | GET | `/h2-console` | Database console | Public (dev only) |
 
 
