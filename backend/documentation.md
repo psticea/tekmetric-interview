@@ -128,7 +128,7 @@ graph TD
     FullAccess --> CreateCustomer[POST /api/v1/customers]
     FullAccess --> UpdateCustomer[PUT /api/v1/customers/id]
     FullAccess --> DeleteCustomer[DELETE /api/v1/customers/id]
-    FullAccess --> AdminFeatures[Swagger UI, Admin Dashboard]
+    FullAccess --> AdminFeatures[Swagger UI, Actuator Endpoints]
     
     Denied --> Error403[403 Forbidden]
 ```
@@ -183,7 +183,7 @@ graph TD
 
 ### 4.2 Configuration Profiles
 
-- **Development**: Debug logging, H2 console, Swagger UI, Admin dashboard
+- **Development**: Debug logging, H2 console, Swagger UI, Actuator endpoints
 - **Production**: Info logging, file-based H2, no Swagger, context path `/api`
 - **Test**: Minimal logging, in-memory H2, no external services
 
@@ -235,13 +235,79 @@ mvn spring-boot:run
 - **Admin**: `admin` / `admin` (full access)
 - **User**: `user` / `password` (read-only)
 
-## 6. Best Practices
+## 6. API Demo with cURL
+
+This section demonstrates the complete CRUD functionality using cURL commands. You can copy and paste these commands to test the API.
+
+### Prerequisites
+1. Start the application: `mvn spring-boot:run`
+2. The application will be available at `http://localhost:8080`
+
+### Authentication Setup
+All API endpoints require HTTP Basic Authentication. Use these credentials:
+- **Admin user**: `admin` / `admin` (full CRUD access)
+- **Regular user**: `user` / `password` (read-only access)
+
+### Demo Commands
+
+#### 1. Get All Customers (with pagination)
+```bash
+# Get first page with 10 customers, sorted by ID descending
+curl -X GET "http://localhost:8080/api/v1/customers?page=1&pageSize=10&sortBy=id&sortDir=desc" \
+  -u admin:admin \
+  -H "Content-Type: application/json"
+```
+
+#### 2. Get Customer by ID
+```bash
+# Get customer with ID 1
+curl -X GET "http://localhost:8080/api/v1/customers/1" \
+  -u admin:admin \
+  -H "Content-Type: application/json"
+```
+
+#### 3. Create New Customer (Admin Only)
+```bash
+curl -X POST "http://localhost:8080/api/v1/customers" \
+  -u admin:admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Demo",
+    "lastName": "User",
+    "email": "demo.user@example.com",
+    "phoneNumber": "+1234567890"
+  }'
+```
+
+#### 4. Update Customer (Admin Only)
+```bash
+# Update customer with ID 1
+curl -X PUT "http://localhost:8080/api/v1/customers/1" \
+  -u admin:admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Updated",
+    "lastName": "Name",
+    "email": "updated.name@example.com",
+    "phoneNumber": "+9876543210"
+  }'
+```
+
+#### 5. Delete Customer (Admin Only - Soft Delete)
+```bash
+# Soft delete customer with ID 1
+curl -X DELETE "http://localhost:8080/api/v1/customers/1" \
+  -u admin:admin \
+  -H "Content-Type: application/json"
+```
+
+## 7. Best Practices
 
 This section details the 20 Spring Boot best practices implemented in this project, providing comprehensive explanations, importance, and verification methods.
 
 ### 1. Modern Java & Spring Boot Stack
 - **Implementation**: Java 17 with Spring Boot 3.3.4 for enhanced performance and security features
-- **Why Important**: Java 17 provides long-term support and modern language features, while Spring Boot 3 offers better observability
+- **Why Important**: Both Java 17 and Spring Boot 3 provide long-term support and modern features
 - **How to Verify**: Check `pom.xml` or run `java -version` and check application startup logs
 
 ### 2. Data Transfer Objects (DTOs)
